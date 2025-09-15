@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Language - luna cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2B48C;
+            --accent-color: #F4E4C1;
+            --dark-brown: #5D2F02;
+            --text-dark: #2C1810;
+            --white: #FFFFFF;
+            --light-bg: #FAF7F2;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--accent-color) 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .language-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .language-option {
+            background: var(--light-bg);
+            border: 3px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .language-option:hover {
+            background: var(--accent-color);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .flag-icon {
+            width: 50px;
+            height: 33px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .language-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .language-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .language-native {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .table-info {
+            background: var(--primary-color);
+            color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .logo {
+                font-size: 2.5rem;
+            }
+            .language-option {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">☕ luna cafe</div>
+        <div class="subtitle">Please select your language</div>
+        
+        <div class="language-options">
+            <div class="language-option" onclick="selectLanguage('en')">
+                <img src="assets/icons/en-flag.svg" alt="English" class="flag-icon">
+                <div class="language-text">
+                    <div class="language-name">English</div>
+                    <div class="language-native">English</div>
+                </div>
+            </div>
+            
+            <div class="language-option" onclick="selectLanguage('ku')">
+                <img src="assets/icons/ku-flag.svg" alt="Kurdish" class="flag-icon">
+                <div class="language-text">
+                    <div class="language-name">Kurdish</div>
+                    <div class="language-native">کوردی</div>
+                </div>
+            </div>
+            
+            <div class="language-option" onclick="selectLanguage('ar')">
+                <img src="assets/icons/ar-flag.svg" alt="Arabic" class="flag-icon">
+                <div class="language-text">
+                    <div class="language-name">Arabic</div>
+                    <div class="language-native">العربية</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-info">
+            🍽️ Table <span id="tableNumber">1</span>
+        </div>
+    </div>
+
+    <script>
+        // Get table number from URL
+        function getTableNumber() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('table') || '1';
+        }
+
+        // Set table number on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableNumber = getTableNumber();
+            document.getElementById('tableNumber').textContent = tableNumber;
+        });
+
+        // Handle language selection
+        function selectLanguage(language) {
+            console.log('Language selected:', language);
+            
+            // Save language preference
+            localStorage.setItem('cafe-language', language);
+            
+            // Get table number
+            const tableNumber = getTableNumber();
+            
+            // Redirect to menu with selected language and table
+            window.location.href = `menu.html?lang=${language}&table=${tableNumber}`;
+        }
+    </script>
+</body>
+</html>

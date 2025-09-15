@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>luna cafe menu </title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-controls">
+                    <!-- Language Selector -->
+                    <div class="language-selector-header" id="languageSelector">
+                        <div class="language-current" id="currentLanguage">
+                            <img src="assets/icons/en-flag.svg" alt="English" id="currentFlag">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="language-dropdown" id="languageDropdown">
+                            <div class="language-option" data-lang="en">
+                                <img src="assets/icons/en-flag.svg" alt="English"> English
+                            </div>
+                            <div class="language-option" data-lang="ku">
+                                <img src="assets/icons/ku-flag.svg" alt="Kurdish"> کوردی
+                            </div>
+                            <div class="language-option" data-lang="ar">
+                                <img src="assets/icons/ar-flag.svg" alt="Arabic"> العربية
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Button -->
+                    
+                </div>
+            </div>
+            
+            <h1 class="cafe-name" data-lang-key="cafe_name">luna cafe</h1>
+            <p class="cafe-subtitle" data-lang-key="welcome_message">Welcome to our premium coffee experience</p>
+            <div class="table-info" id="tableInfo">
+                <i class="fas fa-utensils"></i>
+                <span data-lang-key="table">Table</span>: <span id="tableNumber">1</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Categories -->
+    <nav class="menu-nav">
+        <div class="container">
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="all" data-lang-key="all">All</button>
+                <button class="category-btn" data-category="hot-drinks" data-lang-key="hot_drinks">Hot Drinks</button>
+                <button class="category-btn" data-category="cold-drinks" data-lang-key="cold_drinks">Cold Drinks</button>
+                <button class="category-btn" data-category="desserts" data-lang-key="desserts">Desserts</button>
+                <button class="category-btn" data-category="snacks" data-lang-key="snacks">Snacks</button>
+                <button class="category-btn" data-category="pastries" data-lang-key="pastries">Pastries</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Items -->
+    <main class="menu-container">
+        <div class="container">
+            <div class="menu-grid" id="menuGrid">
+                <!-- Menu items will be loaded here via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart -->
+    <div class="cart" id="cart">
+        <div class="cart-header">
+            <h3 data-lang-key="your_order">Your Order</h3>
+            <button class="cart-toggle" id="cartToggle">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be added here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span data-lang-key="total">Total</span>: <span id="cartTotal">0.00</span>
+                </div>
+                <div class="special-instructions">
+                    <textarea 
+                        id="specialInstructions" 
+                        placeholder="Special instructions..." 
+                        data-lang-key="special_instructions_placeholder">
+                    </textarea>
+                </div>
+                <button class="order-btn" id="orderBtn" data-lang-key="place_order">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Admin Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Admin Login</h2>
+                
+            </div>
+            <div class="modal-body">
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="adminUsername">Username:</label>
+                        <input type="text" id="adminUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content success">
+            <div class="modal-body">
+                <i class="fas fa-check-circle"></i>
+                <h3 data-lang-key="order_sent">Order Sent Successfully!</h3>
+                <p data-lang-key="order_confirmation">Your order has been sent to the kitchen. We'll prepare it shortly.</p>
+                <button class="close-modal" id="closeSuccessModal" data-lang-key="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/translations.js"></script>
+    <script src="assets/js/menu-data.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>luna Cafe Menu</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-controls">
+                    <!-- Language Selector -->
+                    <div class="language-selector-header" id="languageSelector">
+                        <div class="language-current" id="currentLanguage">
+                            <img src="assets/icons/en-flag.svg" alt="English" id="currentFlag">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="language-dropdown" id="languageDropdown">
+                            <div class="language-option" data-lang="en">
+                                <img src="assets/icons/en-flag.svg" alt="English"> English
+                            </div>
+                            <div class="language-option" data-lang="ku">
+                                <img src="assets/icons/ku-flag.svg" alt="Kurdish"> کوردی
+                            </div>
+                            <div class="language-option" data-lang="ar">
+                                <img src="assets/icons/ar-flag.svg" alt="Arabic"> العربية
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Button -->
+                    <button class="admin-btn-header" id="adminBtn" title="Admin Panel">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <h1 class="cafe-name" data-lang-key="cafe_name">luna Cafe</h1>
+            <p class="cafe-subtitle" data-lang-key="welcome_message">Welcome to our premium coffee experience</p>
+            <div class="table-info" id="tableInfo">
+                <i class="fas fa-utensils"></i>
+                <span data-lang-key="table">Table</span>: <span id="tableNumber">1</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Categories -->
+    <nav class="menu-nav">
+        <div class="container">
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="all" data-lang-key="all">All</button>
+                <button class="category-btn" data-category="hot-drinks" data-lang-key="hot_drinks">Hot Drinks</button>
+                <button class="category-btn" data-category="cold-drinks" data-lang-key="cold_drinks">Cold Drinks</button>
+                <button class="category-btn" data-category="desserts" data-lang-key="desserts">Desserts</button>
+                <button class="category-btn" data-category="snacks" data-lang-key="snacks">Snacks</button>
+                <button class="category-btn" data-category="pastries" data-lang-key="pastries">Pastries</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Items -->
+    <main class="menu-container">
+        <div class="container">
+            <div class="menu-grid" id="menuGrid">
+                <!-- Menu items will be loaded here via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart -->
+    <div class="cart" id="cart">
+        <div class="cart-header">
+            <h3 data-lang-key="your_order">Your Order</h3>
+            <button class="cart-toggle" id="cartToggle">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be added here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span data-lang-key="total">Total</span>: $<span id="cartTotal">0.00</span>
+                </div>
+                <div class="special-instructions">
+                    <textarea 
+                        id="specialInstructions" 
+                        placeholder="Special instructions..." 
+                        data-lang-key="special_instructions_placeholder">
+                    </textarea>
+                </div>
+                <button class="order-btn" id="orderBtn" data-lang-key="place_order">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Admin Login</h2>
+                <button class="close-modal" id="closeAdminModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="adminUsername">Username:</label>
+                        <input type="text" id="adminUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content success">
+            <div class="modal-body">
+                <i class="fas fa-check-circle"></i>
+                <h3 data-lang-key="order_sent">Order Sent Successfully!</h3>
+                <p data-lang-key="order_confirmation">Your order has been sent to the kitchen. We'll prepare it shortly.</p>
+                <button class="close-modal" id="closeSuccessModal" data-lang-key="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/translations.js"></script>
+    <script src="assets/js/menu-data.js"></script>
+    <script>
+        // Simple menu and cart functionality for menu.html
+        class SimpleMenuManager {
+            constructor() {
+                this.currentCategory = 'all';
+                this.currentLanguage = 'en';
+                this.init();
+            }
+
+            init() {
+                this.setLanguageFromURL();
+                this.setTableFromURL();
+                this.renderMenu();
+                this.setupCategoryButtons();
+                this.setupCart();
+                this.setupAdminPanel();
+            }
+
+            setLanguageFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const lang = urlParams.get('lang') || localStorage.getItem('cafe-language') || 'en';
+                this.currentLanguage = lang;
+                document.documentElement.lang = lang;
+                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                this.applyTranslations();
+            }
+
+            setTableFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tableNumber = urlParams.get('table') || '1';
+                const tableNumberElement = document.getElementById('tableNumber');
+                if (tableNumberElement) {
+                    tableNumberElement.textContent = tableNumber;
+                }
+            }
+
+            applyTranslations() {
+                if (!translations[this.currentLanguage]) return;
+                
+                const elements = document.querySelectorAll('[data-lang-key]');
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-lang-key');
+                    const translation = translations[this.currentLanguage][key] || translations.en[key] || key;
+                    
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translation;
+                    } else {
+                        element.textContent = translation;
+                    }
+                });
+
+                document.title = translations[this.currentLanguage].cafe_name || 'Modern Cafe';
+            }
+
+            renderMenu(category = 'all') {
+                const menuGrid = document.getElementById('menuGrid');
+                if (!menuGrid || !menuData) return;
+
+                menuGrid.innerHTML = '';
+                
+                const filteredItems = category === 'all' 
+                    ? menuData.items 
+                    : menuData.items.filter(item => item.category === category);
+
+                filteredItems.forEach(item => {
+                    const menuItemElement = this.createMenuItemElement(item);
+                    menuGrid.appendChild(menuItemElement);
+                });
+            }
+
+            createMenuItemElement(item) {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.setAttribute('data-category', item.category);
+
+                const itemName = item.translations[this.currentLanguage]?.name || item.translations.en.name;
+                const itemDescription = item.translations[this.currentLanguage]?.description || item.translations.en.description;
+
+                menuItem.innerHTML = `
+                    <div class="menu-item-image">
+                        ${item.image ? `<img src="${item.image}" alt="${itemName}">` : `<i class="${item.icon}"></i>`}
+                    </div>
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">${itemName}</h3>
+                        <p class="menu-item-description">${itemDescription}</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">$${item.price.toFixed(2)}</span>
+                            <button class="add-to-cart-btn" onclick="menuManager.addToCart('${item.id}')">
+                                ${translations[this.currentLanguage]?.add_to_cart || 'Add to Cart'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                return menuItem;
+            }
+
+            setupCategoryButtons() {
+                const categoryButtons = document.querySelectorAll('.category-btn');
+                
+                categoryButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        categoryButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        const category = button.getAttribute('data-category');
+                        this.currentCategory = category;
+                        this.renderMenu(category);
+                    });
+                });
+            }
+
+            setupCart() {
+                this.cartItems = [];
+                this.total = 0;
+                
+                const cartToggle = document.getElementById('cartToggle');
+                const cart = document.getElementById('cart');
+                
+                if (cartToggle && cart) {
+                    cartToggle.addEventListener('click', () => {
+                        cart.classList.toggle('expanded');
+                    });
+                }
+
+                const orderBtn = document.getElementById('orderBtn');
+                if (orderBtn) {
+                    orderBtn.addEventListener('click', () => this.placeOrder());
+                }
+
+                const closeSuccessModal = document.getElementById('closeSuccessModal');
+                if (closeSuccessModal) {
+                    closeSuccessModal.addEventListener('click', () => {
+                        document.getElementById('successModal').classList.remove('active');
+                    });
+                }
+
+                this.updateCartDisplay();
+            }
+
+            addToCart(itemId) {
+                const item = menuData.items.find(item => item.id === itemId);
+                if (!item) return;
+
+                const existingItem = this.cartItems.find(cartItem => cartItem.id === itemId);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    this.cartItems.push({
+                        ...item,
+                        quantity: 1
+                    });
+                }
+
+                this.updateCartDisplay();
+                this.animateCartButton();
+            }
+
+            updateCartDisplay() {
+                this.calculateTotal();
+                this.updateCartCount();
+                this.renderCartItems();
+                this.updateOrderButton();
+            }
+
+            calculateTotal() {
+                this.total = this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const totalElement = document.getElementById('cartTotal');
+                if (totalElement) {
+                    totalElement.textContent = this.total.toFixed(2);
+                }
+            }
+
+            updateCartCount() {
+                const count = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                const countElement = document.getElementById('cartCount');
+                if (countElement) {
+                    countElement.textContent = count;
+                }
+            }
+
+            renderCartItems() {
+                const cartItemsContainer = document.getElementById('cartItems');
+                if (!cartItemsContainer) return;
+
+                if (this.cartItems.length === 0) {
+                    cartItemsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #6B4E3D;">Your cart is empty</div>';
+                    return;
+                }
+
+                cartItemsContainer.innerHTML = this.cartItems.map(item => {
+                    const itemName = item.translations[this.currentLanguage]?.name || item.translations.en.name;
+                    
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${itemName}</div>
+                                <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="menuManager.updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="quantity-btn" onclick="menuManager.updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            updateQuantity(itemId, newQuantity) {
+                if (newQuantity <= 0) {
+                    this.cartItems = this.cartItems.filter(item => item.id !== itemId);
+                } else {
+                    const item = this.cartItems.find(item => item.id === itemId);
+                    if (item) {
+                        item.quantity = newQuantity;
+                    }
+                }
+                this.updateCartDisplay();
+            }
+
+            updateOrderButton() {
+                const orderBtn = document.getElementById('orderBtn');
+                if (orderBtn) {
+                    orderBtn.disabled = this.cartItems.length === 0;
+                }
+            }
+
+            animateCartButton() {
+                const cartToggle = document.getElementById('cartToggle');
+                if (cartToggle) {
+                    cartToggle.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        cartToggle.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            }
+
+            async placeOrder() {
+                if (this.cartItems.length === 0) return;
+
+                try {
+                    const orderBtn = document.getElementById('orderBtn');
+                    if (orderBtn) {
+                        orderBtn.disabled = true;
+                        orderBtn.textContent = 'Sending...';
+                    }
+
+                    const success = await this.sendToTelegram();
+                    
+                    if (success) {
+                        this.showSuccessModal();
+                        this.clearCart();
+                    } else {
+                        alert('Failed to send order. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Order placement error:', error);
+                    alert('Error placing order. Please try again.');
+                }
+            }
+
+            async sendToTelegram() {
+                const tableNumber = document.getElementById('tableNumber').textContent || '1';
+                const specialInstructions = document.getElementById('specialInstructions')?.value.trim() || '';
+                
+                const orderMessage = this.formatOrderMessage(tableNumber, specialInstructions);
+                
+                const telegramAPI = 'https://api.telegram.org/bot7263049326:AAH3Z4-L3orbFEhlQQiW-LfwPct_FT0JDgg/sendMessage';
+                
+                try {
+                    const response = await fetch(telegramAPI, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: '5873158543',
+                            text: orderMessage,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    return result.ok;
+                } catch (error) {
+                    console.error('Telegram API error:', error);
+                    return false;
+                }
+            }
+
+            formatOrderMessage(tableNumber, specialInstructions) {
+                const currentTime = new Date().toLocaleString();
+                
+                let message = `🍽️ *New Order - Table ${tableNumber}*\n`;
+                message += `📅 ${currentTime}\n`;
+                message += `🌍 Language: ${this.currentLanguage.toUpperCase()}\n\n`;
+                message += `📋 *Order Details:*\n`;
+                
+                this.cartItems.forEach((item, index) => {
+                    const itemName = item.translations[this.currentLanguage]?.name || item.translations.en.name;
+                    message += `${index + 1}. ${itemName}\n`;
+                    message += `   • Quantity: ${item.quantity}\n`;
+                    message += `   • Price: $${item.price.toFixed(2)} each\n`;
+                    message += `   • Subtotal: $${(item.price * item.quantity).toFixed(2)}\n\n`;
+                });
+                
+                message += `💰 *Total: $${this.total.toFixed(2)}*\n\n`;
+                
+                if (specialInstructions) {
+                    message += `📝 *Special Instructions:*\n${specialInstructions}\n\n`;
+                }
+                
+                message += `🏪 Modern Cafe Menu System`;
+                
+                return message;
+            }
+
+            setupAdminPanel() {
+                // Setup admin button
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) {
+                    adminBtn.addEventListener('click', () => {
+                        this.showAdminModal();
+                    });
+                }
+
+                // Setup admin modal
+                const closeAdminModal = document.getElementById('closeAdminModal');
+                const adminLoginForm = document.getElementById('adminLoginForm');
+                const adminModal = document.getElementById('adminModal');
+
+                if (closeAdminModal) {
+                    closeAdminModal.addEventListener('click', () => this.hideAdminModal());
+                }
+
+                if (adminLoginForm) {
+                    adminLoginForm.addEventListener('submit', (e) => this.handleAdminLogin(e));
+                }
+
+                // Close modal when clicking outside
+                if (adminModal) {
+                    adminModal.addEventListener('click', (e) => {
+                        if (e.target === adminModal) {
+                            this.hideAdminModal();
+                        }
+                    });
+                }
+            }
+
+            showAdminModal() {
+                const modal = document.getElementById('adminModal');
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            }
+
+            hideAdminModal() {
+                const modal = document.getElementById('adminModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+
+            handleAdminLogin(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('adminUsername').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                // Get credentials from config
+                const adminCredentials = CAFE_CONFIG?.server?.admin || { username: 'admin', password: 'cafe2024' };
+                
+                if (username === adminCredentials.username && password === adminCredentials.password) {
+                    // Set session
+                    localStorage.setItem('admin-logged-in', 'true');
+                    localStorage.setItem('admin-login-time', Date.now().toString());
+                    
+                    this.hideAdminModal();
+                    // Redirect to admin panel
+                    window.location.href = 'admin/index.html';
+                } else {
+                    alert('Invalid credentials. Please try again.');
+                }
+            }
+
+            showSuccessModal() {
+                const modal = document.getElementById('successModal');
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            }
+
+            clearCart() {
+                this.cartItems = [];
+                this.updateCartDisplay();
+                
+                const specialInstructions = document.getElementById('specialInstructions');
+                if (specialInstructions) {
+                    specialInstructions.value = '';
+                }
+
+                const orderBtn = document.getElementById('orderBtn');
+                if (orderBtn) {
+                    orderBtn.disabled = false;
+                    orderBtn.textContent = translations[this.currentLanguage]?.place_order || 'Place Order';
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        let menuManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            menuManager = new SimpleMenuManager();
+        });
+    </script>
+</body>
+</html>
